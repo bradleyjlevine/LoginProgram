@@ -1,7 +1,14 @@
+//Authors: Bradley Levine, Julian Zebrowski
+//Project 3: Feeling Insecure
+//Files: AES.java, SecureSystem.java, SHA256.java
+//Description: A secure system, nuff said
+//Publisher: Levine Systems Inc.© 
+
 import java.util.Arrays;
 import java.math.BigInteger;
 
 
+@SuppressWarnings("unused")
 public class SHA256
 {
 	private byte[] message;
@@ -11,7 +18,7 @@ public class SHA256
 	
 	private int[] k = {(int)0x428a2f98, (int)0x71374491, (int)0xb5c0fbcf, (int)0xe9b5dba5, (int)0x3956c25b, (int)0x59f111f1, (int)0x923f82a4, (int)0xab1c5ed5,
 					   (int)0xd807aa98, (int)0x12835b01, (int)0x243185be, (int)0x550c7dc3, (int)0x72be5d74, (int)0x80deb1fe, (int)0x9bdc06a7, (int)0xc19bf174,
-					  (int) 0xe49b69c1, (int)0xefbe4786, (int)0x0fc19dc6, (int)0x240ca1cc, (int)0x2de92c6f, (int)0x4a7484aa, (int)0x5cb0a9dc, (int)0x76f988da,
+					   (int)0xe49b69c1, (int)0xefbe4786, (int)0x0fc19dc6, (int)0x240ca1cc, (int)0x2de92c6f, (int)0x4a7484aa, (int)0x5cb0a9dc, (int)0x76f988da,
 					   (int)0x983e5152, (int)0xa831c66d, (int)0xb00327c8, (int)0xbf597fc7, (int)0xc6e00bf3, (int)0xd5a79147, (int)0x06ca6351, (int)0x14292967,
 					   (int)0x27b70a85, (int)0x2e1b2138, (int)0x4d2c6dfc, (int)0x53380d13, (int)0x650a7354, (int)0x766a0abb, (int)0x81c2c92e, (int)0x92722c85,
 					   (int)0xa2bfe8a1, (int)0xa81a664b, (int)0xc24b8b70, (int)0xc76c51a3, (int)0xd192e819, (int)0xd6990624, (int)0xf40e3585, (int)0x106aa070,
@@ -32,9 +39,6 @@ public class SHA256
 		message = padding(a);
 		int[] m = toIntegerArray(message);
 		NUM_BLOCKS = m.length / 16;
-
-		System.out.println("Number of Blocks = " + NUM_BLOCKS);
-		
 		/////////////////////////////////////////////////////////////
 		int[] registers = new int[8];
 		int[] w = new int[64];
@@ -45,16 +49,11 @@ public class SHA256
 		
 		for(int i = 1, pos = 0; i < NUM_BLOCKS + 1; i++)
 		{
-			System.out.println("--------------------------------------Processing Block[" + i + "]");
 
 			//intializing registers
 			for(int j = 0; j < 8; j++)
 				registers[j] = H[i - 1][j];
 			
-			System.out.printf("int:  ");
-			for(int j = 0; j < 8; j++)
-				System.out.printf("%x,  ", registers[j]);
-			System.out.printf("\n");
 			
 			for(int j = 0; j < 64; j++)
 			{
@@ -72,7 +71,6 @@ public class SHA256
 					w[j] =  (int)(((((((long)w2 + (long)w[j - 7]) % MOD) + (long)w15) % MOD) + (long)w[j - 16]) % MOD);
 				}
 
-				System.out.printf("\nW = %d   %x\n", j, w[j]);
 				/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 				//compression function
@@ -95,19 +93,12 @@ public class SHA256
 				registers[1] = registers[0];
 				registers[0] = (int)((t1 + t2) % MOD);
 					
-				System.out.printf("t = %d  ", j);
-				for(int k = 0; k < 8; k++)
-					System.out.printf("%x,  ", registers[k]);
-				System.out.printf("\n");
 			}
-			
-			System.out.printf("H for block[%d]:\n", i);
 
 			//intermediate hash vlaue
 			for(int j = 0; j < 8; j++)
 			{
-				H[i][j] = (int)(((long)registers[j] + (long)H[i - 1][j]) % MOD);
-				System.out.printf("H[%d] = %x + %x = %x\n", j, registers[j], H[i - 1][j], H[i][j] );				
+				H[i][j] = (int)(((long)registers[j] + (long)H[i - 1][j]) % MOD);				
 			}			
 		}
 		
@@ -117,10 +108,17 @@ public class SHA256
 		
 		for(int i = 0; i < 8; i++)
 		{
-			hashDigest.append(String.format("%x", (H[NUM_BLOCKS][i])));
+			StringBuilder temp = new StringBuilder();
+			temp.append(String.format("%x", (H[NUM_BLOCKS][i])));
+			int pad = 8 - temp.length();
+			
+			temp.reverse();
+			for(int j = 0; j < pad; j++)
+				temp.append("0");
+			temp.reverse();
+			
+			hashDigest.append(temp.toString());
 		}
-		
-		System.out.println(Arrays.toString(H[NUM_BLOCKS]));
 
 		return hashDigest.toString();
 	}
@@ -128,10 +126,15 @@ public class SHA256
 	private byte[] padding(byte[] a)
 	{
 		int pad;
-        if(a.length % 64) >= 56 && ((a.length % 64) <= 64)
+        if(((a.length % 64) >= 56 &&  (a.length % 64) < 64))
 		{
 			pad = (64 - ((a.length) % 64)) + 64;
+			System.out.println("The padding size is: " + pad);
 		}
+        else if(((a.length % 64) == 0 && a.length == 64))
+        {
+        	pad = 64;
+        }
 		else
 		{
 			pad = (64 - ((a.length) % 64));
@@ -139,9 +142,7 @@ public class SHA256
 
 		byte[] paddedMessage = new  byte[a.length + pad]; 
  		byte[] temp2 = new byte[8];
-		
-		System.out.println("Calculated Pad = " + pad);
-		System.out.println("Size of new padding array = " + paddedMessage.length);
+ 		
 		//copies the contents of the message into the new array
 		int i;
 		for(i = 0; i < a.length; i++)
@@ -160,7 +161,6 @@ public class SHA256
 				paddedMessage[i] = 0;
 		}
 		
-		System.out.println("Amount of zeros added = " + (n));
 		//gets the last 64 bits from a bigineger byte array
 		BigInteger middleMan = BigInteger.valueOf(a.length * 8);
 		byte[] temp = middleMan.toByteArray();
@@ -174,13 +174,8 @@ public class SHA256
 		for(int k = 0; k < temp.length; k++, j++)
 			temp2[j] = temp[k];
 		
-		System.out.println("Last 64-bits: " + Arrays.toString(temp2));
-		
 		for(int k = paddedMessage.length - 8, m = 0; k < paddedMessage.length; k++, m++)
 			paddedMessage[k] = temp2[m];
-		
-		System.out.println("Padded: " + Arrays.toString(paddedMessage));
-		System.out.println("Padded Length: " + paddedMessage.length * 8);
 		
 		return paddedMessage;		
 	}
@@ -197,10 +192,6 @@ public class SHA256
 				b[j] |= (int)a[i] & 0xFF;
 			}
 		}
-		
-		System.out.println("Binary of integer: " + Integer.toBinaryString(b[0]));
-		System.out.println("Integer version: " + Arrays.toString(b));
-		System.out.println("Length of that: " + (b.length));
 		
 		return b;
 	}	
