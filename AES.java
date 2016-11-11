@@ -1,3 +1,9 @@
+//Authors: Bradley Levine, Julian Zebrowski
+//Project 3: Feeling Insecure
+//Files: AES.java, SecureSystem.java, SHA256.java
+//Description: A secure system, nuff said
+//Publisher: Levine Systems Inc.© 
+
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -45,10 +51,6 @@ public class AES
 	private int start = 0;
 	private int PAD_LEN = 0;
 	private int NUM_BLOCKS = 1;
-	private int currentBlock = 0;
-	private boolean TEST = false;	//set to false if you want to get rid of test output and the use of the testKey
-	
-	private short[] testKey = {0x54, 0x68, 0x61, 0x74, 0x73, 0x20, 0x6D, 0x79, 0x20, 0x4B, 0x75, 0x6E, 0x67, 0x20, 0x46, 0x75};
 
 	public AES()
 	{
@@ -58,6 +60,7 @@ public class AES
 
 	private void loadState(short[] array)
 	{
+
 		for(int i = 0; i < 4; i++)
 		{
 			for(int j = 0; j < 4; j++, start++)
@@ -65,6 +68,7 @@ public class AES
 				state[j][i] = array[start];
 			}
 		}
+		
 	}
 	
 	private void loadKey(short[] array)
@@ -116,7 +120,6 @@ public class AES
 
 		//intalization
 		//////////////////////////////////////////////////////////////////////
-		currentBlock = 0;
 		start = 0;		
 
 		if(needsPadding(text))
@@ -132,10 +135,8 @@ public class AES
 		this.text = toUnsignedShort(text.getBytes());
 		
 		//this loads the key into the the intial key
-		if(TEST)
-			loadKey(testKey);
-		else
-			loadKey(toUnsignedShort(key.toByteArray()));
+
+		loadKey(toUnsignedShort(key.toByteArray()));
 
 		//////////////////////////////////////////////////////////////////////
 		 		
@@ -143,40 +144,12 @@ public class AES
 
 		//creates the keys for all ten rounds
 		generateKeys();
-		
-		if(TEST)
-		{	
-			System.out.println("\nRound Keys:");
-			for(int i = 0; i < 11; i++)
-			{
-				System.out.println("Key [" + i +"]:");
-				for(int j = 0; j < 4; j++)
-				{
-					System.out.printf("[ ");
-					for(int k = 0; k < 4; k++)
-						if(k != 3)
-							System.out.printf("%x, ", keys[i][j][k]);
-						else
-							System.out.printf("%x ]\n", keys[i][j][k]);
-				}
-				System.out.println();
-			}
-		}
-		
+				
 		int p = 0;
 		for(int i = 0; i < NUM_BLOCKS; i++)
 		{
 			//loads the state for each block
 			loadState(this.text);
-		
-			if(TEST)
-			{
-				System.out.println("State for block[" + (i + 1) + "]:");
-				System.out.println(Arrays.toString(state[0]));
-				System.out.println(Arrays.toString(state[1]));
-				System.out.println(Arrays.toString(state[2]));
-				System.out.println(Arrays.toString(state[3]) + "\n");
-			}
 			
 			//initial round addkey
 			addRoundKey(keys[0]);
@@ -203,8 +176,6 @@ public class AES
 					ciphertext[p] = state[n][m];
 				}
 			}
-			
-			currentBlock++;
 		}
 
 		return ciphertext;
@@ -215,7 +186,6 @@ public class AES
 
 		//intalization
 		//////////////////////////////////////////////////////////////////////
-		currentBlock = 0;
 		start = 0;		
 
 		if(needsPadding(text))
@@ -229,18 +199,10 @@ public class AES
 		
 		//converts the text into a byte array and gets the 
 		this.text = toUnsignedShort(text.getBytes());
-		
-		if(key.length() != 16)
-		{
-			System.out.println("ERROR-Invalid Key Size");
-			System.exit(0);
-		}
 
 		//this loads the key into the the intial key
-		if(TEST)
-			loadKey(testKey);
-		else
-			loadKey(toUnsignedShort(key.getBytes()));
+
+		loadKey(toUnsignedShort(key.getBytes()));
 
 		//////////////////////////////////////////////////////////////////////
 		 		
@@ -249,39 +211,11 @@ public class AES
 		//creates the keys for all ten rounds
 		generateKeys();
 		
-		if(TEST)
-		{	
-			System.out.println("\nRound Keys:");
-			for(int i = 0; i < 11; i++)
-			{
-				System.out.println("Key [" + i +"]:");
-				for(int j = 0; j < 4; j++)
-				{
-					System.out.printf("[ ");
-					for(int k = 0; k < 4; k++)
-						if(k != 3)
-							System.out.printf("%x, ", keys[i][j][k]);
-						else
-							System.out.printf("%x ]\n", keys[i][j][k]);
-				}
-				System.out.println();
-			}
-		}
-		
 		int p = 0;
 		for(int i = 0; i < NUM_BLOCKS; i++)
 		{
 			//loads the state for each block
 			loadState(this.text);
-		
-			if(TEST)
-			{
-				System.out.println("State for block[" + (i + 1) + "]:");
-				System.out.println(Arrays.toString(state[0]));
-				System.out.println(Arrays.toString(state[1]));
-				System.out.println(Arrays.toString(state[2]));
-				System.out.println(Arrays.toString(state[3]) + "\n");
-			}
 			
 			//initial round addkey
 			addRoundKey(keys[0]);
@@ -308,8 +242,6 @@ public class AES
 					ciphertext[p] = state[n][m];
 				}
 			}
-			
-			currentBlock++;
 		}
 
 		return ciphertext;
@@ -320,17 +252,14 @@ public class AES
 		//intalization
 		//////////////////////////////////////////////////////////////////////
 		start = 0;
-		currentBlock = 0;		
 		NUM_BLOCKS = cipherbytes.length / 16;
 		
 		//converts the text into a byte array and gets the 
 		this.text = cipherbytes;
 		
 		//this loads the key into the the intial key
-		if(TEST)
-			loadKey(testKey);
-		else
-			loadKey(toUnsignedShort(key.toByteArray()));
+
+		loadKey(toUnsignedShort(key.toByteArray()));
 
 		//////////////////////////////////////////////////////////////////////
 		 		
@@ -339,39 +268,11 @@ public class AES
 		//creates the keys for all ten rounds
 		generateKeys();
 		
-		if(TEST)
-		{	
-			System.out.println("\nRound Keys:");
-			for(int i = 0; i < 11; i++)
-			{
-				System.out.println("Key [" + i +"]:");
-				for(int j = 0; j < 4; j++)
-				{
-					System.out.printf("[ ");
-					for(int k = 0; k < 4; k++)
-						if(k != 3)
-							System.out.printf("%x, ", keys[i][j][k]);
-						else
-							System.out.printf("%x ]\n", keys[i][j][k]);
-				}
-				System.out.println();
-			}
-		}
-		
 		int p = 0;
 		for(int i = 0; i < NUM_BLOCKS; i++)
 		{
 			//loads the state for each block
 			loadState(this.text);
-		
-			if(TEST)
-			{
-				System.out.println("State for block[" + (i + 1) + "]:");
-				System.out.println(Arrays.toString(state[0]));
-				System.out.println(Arrays.toString(state[1]));
-				System.out.println(Arrays.toString(state[2]));
-				System.out.println(Arrays.toString(state[3]) + "\n");
-			}
 			
 			//inverse final round
 			addRoundKey(keys[10]);
@@ -399,34 +300,31 @@ public class AES
 				}
 			}
 			
-			currentBlock++;
 		}
-
-		return (new String(plaintext));
+		
+		StringBuilder a = new StringBuilder();
+		a.append(new String(plaintext));
+		
+		int loc;
+		while((loc = a.indexOf("\0")) > -1)
+			a.deleteCharAt(loc);
+				
+		return a.toString();
 	}
 
 	public String decrypt(String key, short[] cipherbytes)
 	{
 		//intalization
 		//////////////////////////////////////////////////////////////////////
-		start = 0;
-		currentBlock = 0;		
+		start = 0;	
 		NUM_BLOCKS = cipherbytes.length / 16;
 		
 		//converts the text into a byte array and gets the 
 		this.text = cipherbytes;
-		
-		if(key.length() != 16)
-		{
-			System.out.println("ERROR-Invalid Key Size");
-			System.exit(0);
-		}
 
 		//this loads the key into the the intial key
-		if(TEST)
-			loadKey(testKey);
-		else
-			loadKey(toUnsignedShort(key.getBytes()));
+		
+		loadKey(toUnsignedShort(key.getBytes()));
 
 		//////////////////////////////////////////////////////////////////////
 		 		
@@ -435,39 +333,11 @@ public class AES
 		//creates the keys for all ten rounds
 		generateKeys();
 		
-		if(TEST)
-		{	
-			System.out.println("\nRound Keys:");
-			for(int i = 0; i < 11; i++)
-			{
-				System.out.println("Key [" + i +"]:");
-				for(int j = 0; j < 4; j++)
-				{
-					System.out.printf("[ ");
-					for(int k = 0; k < 4; k++)
-						if(k != 3)
-							System.out.printf("%x, ", keys[i][j][k]);
-						else
-							System.out.printf("%x ]\n", keys[i][j][k]);
-				}
-				System.out.println();
-			}
-		}
-		
 		int p = 0;
 		for(int i = 0; i < NUM_BLOCKS; i++)
 		{
 			//loads the state for each block
 			loadState(this.text);
-		
-			if(TEST)
-			{
-				System.out.println("State for block[" + (i + 1) + "]:");
-				System.out.println(Arrays.toString(state[0]));
-				System.out.println(Arrays.toString(state[1]));
-				System.out.println(Arrays.toString(state[2]));
-				System.out.println(Arrays.toString(state[3]) + "\n");
-			}
 			
 			//inverse final round
 			addRoundKey(keys[10]);
@@ -495,24 +365,20 @@ public class AES
 				}
 			}
 			
-			currentBlock++;
 		}
-
-		return (new String(plaintext));
+		
+		StringBuilder a = new StringBuilder();
+		a.append(new String(plaintext));
+		
+		int loc;
+		while((loc = a.indexOf("\0")) > -1)
+			a.deleteCharAt(loc);
+				
+		return a.toString();
 	}
 
 	private void addRoundKey(short[][] key)
 	{
-		if(TEST)
-		{
-			System.out.println("------------------------------------------------------------");
-			System.out.println("State for block before addRoundKey[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]) + "\n");
-		}
-
 		for(int i = 0; i < 4; i++)
 		{
 			for(int j = 0; j < 4; j++)
@@ -520,30 +386,10 @@ public class AES
 				state[i][j] ^= key[i][j];
 			}
 		}
-
-		if(TEST)
-		{
-			System.out.println("State for block after addRoundKey[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]));
-			System.out.println("------------------------------------------------------------");
-		}
 	}
 	
 	private void substituteBytes()
 	{
-
-		if(TEST)
-		{
-			System.out.println("------------------------------------------------------------");
-			System.out.println("State for block before substituteBytes[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]) + "\n");
-		}
 
 		for(int i = 0; i < 4; i++)
 		{
@@ -553,28 +399,10 @@ public class AES
 			}
 		}
 
-		if(TEST)
-		{
-			System.out.println("State for block after substituteBytes[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]));
-			System.out.println("------------------------------------------------------------");
-		}
 	} 
 
 	private void inverseSubstituteBytes()
 	{
-		if(TEST)
-		{
-			System.out.println("------------------------------------------------------------");
-			System.out.println("State for block before inverseSubstituteBytes[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]) + "\n");
-		}
 
 		for(int i = 0; i < 4; i++)
 		{
@@ -584,28 +412,10 @@ public class AES
 			}
 		}
 
-		if(TEST)
-		{
-			System.out.println("State for block after inverseSubstituteBytes[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]));
-			System.out.println("------------------------------------------------------------");
-		}
 	}
 
 	private void shiftRows()
 	{
-		if(TEST)
-		{
-			System.out.println("------------------------------------------------------------");
-			System.out.println("State for block before shiftRows[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]) + "\n");
-		}
 		//the zeroth row is not shifted
 		
 		//the 1st row is shfited one to the left
@@ -631,30 +441,12 @@ public class AES
 		state[3][1] = temp;
 		state[3][2] = temp2;
 		state[3][3] = temp3;
-		
-		if(TEST)
-		{
-			System.out.println("State for block after shiftRows[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]));
-			System.out.println("------------------------------------------------------------");
-		}
+
 	}
 	
 	private void inverseShiftRows()
 	{
 
-		if(TEST)
-		{
-			System.out.println("------------------------------------------------------------");
-			System.out.println("State for block before inverseShiftRows[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]) + "\n");
-		}
 		short temp, temp2, temp3, temp4;
 		//nothing happens to the first row
 		
@@ -691,30 +483,11 @@ public class AES
 		state[3][2] = temp4;
 		state[3][3] = temp;
 			
-		if(TEST)
-		{
-			System.out.println("State for block after inverseShiftRows[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]));
-			System.out.println("------------------------------------------------------------");
-		}
 	}
 
 	private void mixColumns()
 	{
 		short[][] temp = new short[4][4];
-
-		if(TEST)
-		{
-			System.out.println("------------------------------------------------------------");
-			System.out.println("State for block before mixColumns[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]) + "\n");
-		}
 		
 		for(int j = 0; j < 4; j++)
 		{
@@ -728,30 +501,10 @@ public class AES
 		{
 			state[i] = Arrays.copyOf(temp[i], 4);
 		}
-		
-		if(TEST)
-		{
-			System.out.println("State for block after mixColumns[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]));
-			System.out.println("------------------------------------------------------------");
-		}
 	}
 
 	private void inverseMixColumns()
 	{
-		if(TEST)
-		{
-			System.out.println("------------------------------------------------------------");
-			System.out.println("State for block before inverseMixColumns[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]) + "\n");
-		}
-
 		final int SIZE = 4;
 		short[] a = new short[SIZE];  
 
@@ -767,16 +520,6 @@ public class AES
 			state[3][j] = (short) (galoisMultiply(a[3],14) ^ galoisMultiply(a[2],9) ^ galoisMultiply(a[1],13) ^ galoisMultiply(a[0],11));
 		 }
 		
-		if(TEST)
-		{
-			
-			System.out.println("State for block after MixColumns[" + (currentBlock + 1) + "]:");
-			System.out.println(Arrays.toString(state[0]));
-			System.out.println(Arrays.toString(state[1]));
-			System.out.println(Arrays.toString(state[2]));
-			System.out.println(Arrays.toString(state[3]));
-			System.out.println("------------------------------------------------------------");
-		}
 	}
 
 	private short galoisMultiply(int a, int b)
