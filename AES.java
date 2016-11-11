@@ -58,8 +58,6 @@ public class AES
 
 	private void loadState(short[] array)
 	{
-		System.out.print("State loading from array at " + start);
-
 		for(int i = 0; i < 4; i++)
 		{
 			for(int j = 0; j < 4; j++, start++)
@@ -67,8 +65,6 @@ public class AES
 				state[j][i] = array[start];
 			}
 		}
-		
-		System.out.println(" to " + start);
 	}
 	
 	private void loadKey(short[] array)
@@ -188,7 +184,6 @@ public class AES
 			//rounds 1 - 9	
 			for(int round = 1; round < 10; round++)
 			{	
-				System.out.println("-----------------------------------------------------------Round = " + round);
 				substituteBytes();
 				shiftRows();
 				mixColumns();
@@ -294,7 +289,6 @@ public class AES
 			//rounds 1 - 9	
 			for(int round = 1; round < 10; round++)
 			{	
-				System.out.println("-----------------------------------------------------------Round = " + round);
 				substituteBytes();
 				shiftRows();
 				mixColumns();
@@ -387,7 +381,6 @@ public class AES
 			//rounds 9 - 1	
 			for(int round = 9; round > 0; round--)
 			{	
-				System.out.println("-----------------------------------------------------------Round = " + round);
 				addRoundKey(keys[round]);
 				inverseMixColumns();
 				inverseShiftRows();
@@ -484,7 +477,6 @@ public class AES
 			//rounds 9 - 1	
 			for(int round = 9; round > 0; round--)
 			{	
-				System.out.println("-----------------------------------------------------------Round = " + round);
 				addRoundKey(keys[round]);
 				inverseMixColumns();
 				inverseShiftRows();
